@@ -1,0 +1,235 @@
+@font-face {
+    font-family: 'RobotoMono';
+    src: url('assets/RobotoMono-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    font-family: 'RobotoMono', monospace;
+    background-color: #36393f;
+    color: #fff;
+}
+
+#app-view {
+    margin: 0 auto;
+    /* padding: 20px; */
+    background-color: #2f3136;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Media query for viewport width greater than or equal to 1024px */
+@media screen and (min-width: 1024px) {
+    #app-view {
+        width: 80%;
+    }
+}
+
+/* Media query for viewport width between 768px and 1023px */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    #app-view {
+        width: 90%;
+    }
+}
+
+/* Media query for viewport width less than 768px */
+@media screen and (max-width: 767px) {
+    #app-view {
+        width: 100%;
+    }
+}
+
+#app-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: #2f3136;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+}
+
+.menu-item {
+    display: inline-block;
+    margin: 0;
+}
+
+.menu-item a {
+    display: block;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* add transition effect for both background and text color */
+}
+
+.menu-item a:hover {
+    background-color: #40444b;
+    color: #7289da;
+}
+
+.menu-item:first-child a {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.menu-item:last-child a {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#page-view {
+    background-color: #2f3136;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 10px 10px 10px;
+    padding: 0 20px 20px 20px;
+    border-radius: 10px;
+}
+
+.content {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+/* Room List Styles */
+
+.room-list {
+    list-style: none;
+    padding: 0;
+}
+
+.room-list li {
+    margin-bottom: 10px;
+}
+
+.room-list a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #40444b;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.room-list a:hover {
+    background-color: #7289da;
+}
+
+/* Create Room Button Styles */
+
+.page-control {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.room-name {
+    width: calc(70% - 200px);
+    padding: 10px;
+    margin: 20px;
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #7289da;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    /* add transition effect */
+}
+
+button:hover {
+    background-color: #48588b;
+}
+
+/* Chat.html styles */
+
+.message-list {
+    margin-top: 20px;
+    overflow-y: scroll;
+    height: 60vh;
+    font-size: 14px;
+    padding: 15px;
+}
+
+.message {
+    background-color: #40444b;
+    padding: 15px;
+    margin: 10px 0 10px 0;
+    border-radius: 5px;
+    clear: both;
+    float: left;
+    /* messages for other users stick to the left */
+}
+
+.my-message {
+    background-color: #7689c9;
+    color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    float: right;
+    clear: both;
+}
+
+/* Profile Form Styles */
+
+.profile-form {
+    margin-bottom: 20px;
+}
+
+.form-field {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #7289da;
+}
+
+input[type="text"],
+input[type="password"],
+textarea,
+input[type="file"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #dddddd00;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    color: #fff;
+    background-color: rgb(56, 58, 63);
+    outline: none;
+    height: 30px;
+    line-height: 30px;
+    resize: none;
+    text-indent: 15px;
+}
+
+input[type="file"] {
+    padding: 5px;
+}
+
+.message-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+    background-color: rgba(26, 27, 30, 0.754);
+    border-radius: 6px;
+}
+
+.message-list::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#app-view + div {
+    color: black;
+}
