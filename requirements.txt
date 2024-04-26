@@ -1,0 +1,5 @@
+flask
+pdfminer.six
+cohere
+python-docx
+youtube_transcript_api

@@ -1,11 +1,10 @@
-const cpen322 = require('./cpen322-tester.js');
 const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const ws = require('ws');
 const Database = require('./Database')
 const SessionManager = require('./SessionManager');
 const crypto = require('crypto');
+const axios = require('axios');
 
 // let mongoUrl = 'mongodb://localhost:27017'; 
 let mongoUrl = 'mongodb://127.0.0.1:27017';
@@ -180,7 +179,6 @@ app.use(function (err, req, res, next) {
 })
 
 broker.on('connection', function connection(ws, incomingMessage) {
-    
 	if (incomingMessage.headers.cookie == undefined) {
 		ws.close();
 		return;
@@ -193,11 +191,67 @@ broker.on('connection', function connection(ws, incomingMessage) {
 		return;
     }
     
-	ws.on('message', (data) => {
+	ws.on('message', async (data) => {
+        var hasSummary = false;
 		var msg = JSON.parse(data);
+        // To check the sent pdf file. (It can receive .pdf, .docx, .txt)
+        // console.log('File received:', msg);
+
+        // Check if message is a file
+        if ('file' in msg) {
+            const formData = new FormData();
+            formData.append('file', msg.file.data);
+
+            if (msg.file.type == 'application/pdf') {
+                // await axios.post('http://127.0.0.1:3001/process_pdf', formData)
+                await axios.post('http://localhost:3001/process_pdf', formData)
+                    .then((response) => {
+                        msg.text = response.data.data;
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        return;
+                    });
+            } else {
+                // await axios.post('http://127.0.0.1:3001/process_file', formData)
+                await axios.post('http://localhost:3001/process_file', formData)
+                    .then((response) => {
+                        msg.text = response.data.data;
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        return;
+                    });
+            }
+
+            hasSummary = true;
+        } else {
+            msg.text = sanitize(msg.text);
+
+            videoId = extractYouTubeVideoId(msg.text);
+            if (videoId) {
+                // Send video ID to Python server
+                await axios.get('http://localhost:3001/process_video', {
+                    params: {
+                        videoId: videoId
+                    }
+                })
+                .then(function (response) {
+                    msg.text = `https://www.youtube.com/watch?v=${videoId}\n${response.data.data}`;
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    return;
+                });
+                
+                hasSummary = true;
+            }
+        }
         
+        // msg.text = summary
+        console.log("MSG text: \n" + JSON.stringify(msg.text));
+
         msg.username = sessionManager.getUsername(cookie);
-		msg.text = sanitize(msg.text);
 
 		broker.clients.forEach((client) => {
 			if (client != ws) {
@@ -209,7 +263,7 @@ broker.on('connection', function connection(ws, incomingMessage) {
 		msgObj["username"] = sessionManager.getUsername(cookie);
 		msgObj["text"] = msg.text;
 		messages[msg.roomId].push(msgObj);
-        
+
         if (messages[msg.roomId].length == messageBlockSize) {
             var conv = {
                 'room_id' : msg.roomId,
@@ -221,6 +275,10 @@ broker.on('connection', function connection(ws, incomingMessage) {
                 (reject) => {}
             );
         }
+
+        msg.username = msgObj["username"];
+
+        if (hasSummary) ws.send(JSON.stringify({ message: msg }));
 	})
 })
   
@@ -233,11 +291,27 @@ function isCorrectPassword(password, saltedHash) {
 }
 
 function sanitize(string) {
-    let regexp = /on[a-zA-Z]+="|<\/script>|<script/g;
-    return string.replace(regexp, function(match) {
-        return match.startsWith("on") ? "censored" : "&lt;script";
-    });
+    if (typeof string === 'string') {
+        let regexp = /on[a-zA-Z]+="|<\/script>|<script/g;
+        return string.replace(regexp, function(match) {
+            return match.startsWith("on") ? "censored" : "&lt;script";
+        });
+    } else {
+        return '';
+    }
 }
 
-cpen322.connect('http://3.98.223.41/cpen322/test-a5-server.js');
-cpen322.export(__filename, { app, db, messages, messageBlockSize, sessionManager, isCorrectPassword });
+function extractYouTubeVideoId(string) {
+    // Regular expression to match YouTube URLs
+    var youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    
+    // Check if the URL matches the YouTube URL pattern
+    var match = string.match(youtubeRegex);
+    
+    // If there is a match, extract and return the video ID
+    if (match && match[1]) {
+        return match[1];
+    } else {
+        return null; // Return null if no match found
+    }
+}
